@@ -191,16 +191,17 @@ def create_document():
     try:
         if not 'fileupload' in request.files:
             abort(400)
-
-        alf_file = request.files['fileupload'].stream.read()
+        alf_file = request.files['fileupload']
         repo, status = get_repository()
         if repo:
             folder, status = get_folder(settings.NODE_FOLDER_UPLOAD, repo)
             if folder:
-                file = base64.b64encode(request.files['fileupload'].stream)
+                file = alf_file.stream
                 filename = request.files['fileupload'].filename
                 if file:
                     pdb.set_trace()
+#                    datos = file.read()
+#                    datos_binary =  base64.b64encode(datos)
                     document = folder.createDocument(filename, contentFile=file)
                     file.close()
                     return make_response(jsonify({'id': 1, 'response': 'successfull',
