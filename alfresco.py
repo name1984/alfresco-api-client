@@ -1,7 +1,7 @@
 #!flask/bin/python
 
 from datetime import datetime
-from flask import Flask, jsonify, make_response, redirect, url_for, request
+from flask import Flask, jsonify, make_response, redirect, url_for, request, abort
 import settings
 import requests
 from lxml import etree
@@ -9,6 +9,7 @@ from cmislib.model import CmisClient
 from cmislib.exceptions import ObjectNotFoundException, UpdateConflictException
 import pdb
 import sys
+import base64
 
 sys.setrecursionlimit(1500)
 app = Flask(__name__)
@@ -188,18 +189,19 @@ def load_file(path):
 @app.route('/todo/api/v1.0/document', methods=['POST'])
 def create_document():
     try:
-        if not request.json or not 'path' in request.json or not 'name' in request.json:
+        if not 'fileupload' in request.files:
             abort(400)
 
-        path_file = request.json['path']
-        file_name = request.json['name']
+        alf_file = request.files['fileupload'].stream.read()
         repo, status = get_repository()
         if repo:
             folder, status = get_folder(settings.NODE_FOLDER_UPLOAD, repo)
             if folder:
-                file = load_file(path_file)
+                file = base64.b64encode(request.files['fileupload'].stream)
+                filename = request.files['fileupload'].filename
                 if file:
-                    document = folder.createDocument(file_name, contentFile=file)
+                    pdb.set_trace()
+                    document = folder.createDocument(filename, contentFile=file)
                     file.close()
                     return make_response(jsonify({'id': 1, 'response': 'successfull',
                                                   'document_id': document.getProperties().get('alfcmis:nodeRef'),
