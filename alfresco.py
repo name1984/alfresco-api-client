@@ -168,7 +168,7 @@ def get_alfresco_documents(node_folder_portal):
 
 @app.route('/todo/api/v1.0/get_documents', methods=['GET'])
 def get_documentv2():
-    node_folder_portal = request.args.get('node_folder_portal')
+    node_folder_portal = settings.NODE_FOLDER_PORTAL
     if is_ticket_valid():
         return get_alfresco_documents(node_folder_portal)
     else:
